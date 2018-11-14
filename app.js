@@ -14,16 +14,31 @@ var app = express();
 
 var cons = require('consolidate');
 
+
+
+
+app.use(function (req, res, next) {
+    res.header("Access-Control-Allow-Origin", "http://localhost:4200");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type,x-access-token, Accept");
+    next();
+});
+
+
+
 // view engine setup
 app.engine('html', cons.swig)
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'html');
 
+
+
+
+
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'dist/angular-registration-login-example')));
 app.use('/api', apiRouter);
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
@@ -45,12 +60,21 @@ mongoose.connect(config.DATABASE)
        next(createError(404));
 });
 
-app.use(function (req, res, next) {
-    res.header("Access-Control-Allow-Origin", "http://localhost:4200");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-    next();
-});
+
+// app.use(function (req, res, next) {
+//     res.header("Access-Control-Allow-Origin", "http://localhost");
+//     res.header("Access-Control-Allow-Headers", "*");
+//     res.header("Access-Control-Allow-Credentials","true");
+//     res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+
+//     next();
+// });
+
+// app.use(function (req, res, next) {
+//     res.header("Access-Control-Allow-Origin", "*");
+//     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+//     next();
+// });
 
 // error handler
 app.use(function (err, req, res, next) {

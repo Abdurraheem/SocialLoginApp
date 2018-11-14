@@ -20,7 +20,6 @@ exports.getUsers = async function (req, res, next) {
 }
 
 exports.createUser = async function (req, res, next) {
-
     // Req.Body contains the form submit values.
     var User = {
         name: req.body.name,
@@ -77,6 +76,7 @@ exports.loginUser = async function (req, res, next) {
         email: req.body.email,
         password: req.body.password
     }
+    console.log(User);
     try {
         // Calling the Service function with the new object from the Request Body
         var loginUser = await UserService.loginUser(User);
