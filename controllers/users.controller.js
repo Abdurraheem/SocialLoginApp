@@ -12,10 +12,10 @@ exports.getUsers = async function (req, res, next) {
     try {
         var Users = await UserService.getUsers({}, page, limit)
         // Return the Users list with the appropriate HTTP password Code and Message.
-        return res.status(200).send({ status: 200, data: Users, message: "Succesfully Users Recieved" });
+        return res.status(200).json({status: 200, data: Users, message: "Succesfully Users Recieved"});
     } catch (e) {
         //Return an Error Response Message with Code and the Error Message.
-        return res.status(400).send({ status: 400, message: e.message });
+        return res.status(400).json({status: 400, message: e.message});
     }
 }
 
@@ -30,10 +30,10 @@ exports.createUser = async function (req, res, next) {
     try {
         // Calling the Service function with the new object from the Request Body
         var createdUser = await UserService.createUser(User)
-        return res.status(201).send({ token: createdUser, message: "Succesfully Created User" })
+        return res.status(201).json({token: createdUser, message: "Succesfully Created User"})
     } catch (e) {
         //Return an Error Response Message with Code and the Error Message.
-        return res.status(400).send({ status: 400, message: "User Creation was Unsuccesfull" })
+        return res.status(400).json({status: 400, message: "User Creation was Unsuccesfull"})
     }
 }
 
@@ -41,7 +41,7 @@ exports.updateUser = async function (req, res, next) {
 
     // Id is necessary for the update
     if (!req.body._id) {
-        return res.status(400).send({ status: 400., message: "Id must be present" })
+        return res.status(400).json({status: 400., message: "Id must be present"})
     }
 
     var id = req.body._id;
@@ -53,9 +53,9 @@ exports.updateUser = async function (req, res, next) {
     }
     try {
         var updatedUser = await UserService.updateUser(User)
-        return res.status(200).send({ status: 200, data: updatedUser, message: "Succesfully Updated User" })
+        return res.status(200).json({status: 200, data: updatedUser, message: "Succesfully Updated User"})
     } catch (e) {
-        return res.status(400).send({ status: 400., message: e.message })
+        return res.status(400).json({status: 400., message: e.message})
     }
 }
 
@@ -66,7 +66,7 @@ exports.removeUser = async function (req, res, next) {
         var deleted = await UserService.deleteUser(id);
         res.status(200).send("Succesfully Deleted... ");
     } catch (e) {
-        return res.status(400).send({ status: 400, message: e.message })
+        return res.status(400).json({status: 400, message: e.message})
     }
 }
 
@@ -80,10 +80,11 @@ exports.loginUser = async function (req, res, next) {
     try {
         // Calling the Service function with the new object from the Request Body
         var loginUser = await UserService.loginUser(User);
-        return res.status(201).send({ token: loginUser, message: "Succesfully login" })
+        return res.status(201).json({token: loginUser, message: "Succesfully login"})
     } catch (e) {
         //Return an Error Response Message with Code and the Error Message.
-        return res.status(400).send({ status: 400, message: "Invalid username or password" })
+        return res.status(400).json({status: 400, message: "Invalid username or password"})
     }
 }
-
+    
+    
