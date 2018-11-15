@@ -6,9 +6,7 @@ import { User } from '../_models';
 
 @Injectable()
 export class UserService {
-    constructor(private http: HttpClient) { 
-        
-    }
+    constructor(private http: HttpClient) { }
 
 
     getAll() {
@@ -21,6 +19,10 @@ export class UserService {
 
     register(user: User) {
         return this.http.post(`${environment.apiUrl}/api/users/registration`, user);
+    }
+
+    fbLogin() {
+        return this.http.get(`${environment.apiUrl}/api/users/auth/facebook`);
     }
 
     update(user: User) {

@@ -1,1 +1,36 @@
-/* You can add global styles to this file, and also import other style files */
+.social_login .social_box {
+		display: block;
+		clear: both;
+		padding: 10px;
+		margin-bottom: 10px;
+		background: #c1c4c7;
+		overflow: hidden;
+}
+
+.social_login .icon {
+		display: block;
+		width: 10px;
+		padding: 5px 20px;
+		margin-right: 10px;
+		float: left;
+		color: #FFF;
+		font-size: 16px;
+		text-align: center;
+}
+
+.social_login .fb .icon {
+		background: #3B5998;
+}
+
+.social_login .google .icon {
+		background: #DD4B39;
+}
+
+.social_login .icon_title {
+		display: block;
+		padding: 5px 0;
+		float: left;
+		font-weight: bold;
+		font-size: 16px;
+		color: #777;
+}

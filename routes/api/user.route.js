@@ -11,6 +11,9 @@ router.get('/', Authorization, UserController.getUsers)
 router.put('/', Authorization, UserController.updateUser)
 router.delete('/:id', Authorization, UserController.removeUser)
 
+router.get('/auth/facebook', UserController.FacebookLogin);
+//router.get('/callback/facebook', FacebookRoutes.callback(), redirectSocialUser);
+
 // Export the Router
 module.exports = router;
 
