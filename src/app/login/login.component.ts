@@ -56,16 +56,34 @@ export class LoginComponent implements OnInit {
                 });
     }
 
-    //FaceBook Login 
-    fbLogin() {
+
+
+    signInWithFB(): void {
+      //  window.open("http://localhost:3000/auth/facebook/callback");
+
+
+        // Create a browser window
+        var win = {
+            width: 800,
+            height: 600,
+            center: true,
+            resizable: false,
+            frame: true,
+            transparent: false
+        };
+        // Load the page + route
+        window.open('http://localhost:3000/auth/facebook/callback', 'SocialApp', win);
+
+
         this.UserService.fbLogin().pipe(first())
             .subscribe(
-            data => {
-                this.router.navigate([this.returnUrl]);
-            },
-            error => {
-                this.alertService.error(error);
-                this.loading = false;
-            });
+                data => {
+                    this.router.navigate([this.returnUrl]);
+                },
+                error => {
+                    this.alertService.error(error);
+                    this.loading = false;
+                });
+       // this.authService.signIn(FacebookLoginProvider.PROVIDER_ID);
     }
 }

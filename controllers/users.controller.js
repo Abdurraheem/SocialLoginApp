@@ -95,13 +95,10 @@ exports.loginUser = async function (req, res, next) {
 
 exports.FacebookLogin = async function(req,res,next){
 
-console.log('-------');
-    console.log(congig.facebook);
-
     passport.use('facebook', new FacebookStrategy({
-        clientID: fbConfig.appID,
-        clientSecret: fbConfig.appSecret,
-        callbackURL: fbConfig.callbackUrl
+        clientID: config.facebook.app_id,
+        clientSecret: config.facebook.app_secret,
+        callbackURL: config.facebook.callback
     },
 
         // facebook will send back the tokens and profile
