@@ -95,51 +95,109 @@ exports.loginUser = async function (req, res, next) {
 
 exports.FacebookLogin = async function(req,res,next){
 
-    passport.use('facebook', new FacebookStrategy({
-        clientID: config.facebook.app_id,
-        clientSecret: config.facebook.app_secret,
-        callbackURL: config.facebook.callback
-    },
+    console.log(req.body);
 
-        // facebook will send back the tokens and profile
-        function (access_token, refresh_token, profile, done) {
-            // asynchronous
-            process.nextTick(function () {
+       console.log('===Im not here...=================');
+   var url = 'https://www.facebook.com/v2.11/dialog/oauth?response_type=code&client_id=' + config.facebookAuth.clientID + '&redirect_uri=' + config.facebookAuth.callbackURL + '&scope=public_profile,email';
+    res.redirect(url);
 
-                // find the user in the database based on their facebook id
-                User.findOne({ 'id': profile.id }, function (err, user) {
 
-                    // if there is an error, stop everything and return that
-                    // ie an error connecting to the database
-                    if (err)
-                        return done(err);
 
-                    // if the user is found, then log them in
-                    if (user) {
-                        return done(null, user); // user found, return that user
-                    } else {
-                        // if there is no user found with that facebook id, create them
-                        var newUser = new User();
+//--------------------------------------------------------------------------//
+//                             FACEBOOK LOGIN                               //
+//--------------------------------------------------------------------------//
 
-                        // set all of the facebook information in our user model
-                        newUser.fb.id = profile.id; // set the users facebook id                 
-                        newUser.fb.access_token = access_token; // we will save the token that facebook provides to the user                    
-                        newUser.fb.firstName = profile.name.givenName;
-                        newUser.fb.lastName = profile.name.familyName; // look at the passport user profile to see how names are returned
-                        newUser.fb.email = profile.emails[0].value; // facebook can return multiple emails so we'll take the first
+// router.get('/facebook', function (req, res) {
+//     if(req.query.returnUrl){
+//         req.session.returnUrl=req.query.returnUrl;
+//     }
+//     var url = 'https://www.facebook.com/v2.11/dialog/oauth?response_type=code&client_id=' + config.facebookAuth.clientID + '&redirect_uri=' + config.facebookAuth.callbackURL + '&scope=public_profile,email';
+//     res.redirect(url);
+// });
 
-                        // save our user to the database
-                        newUser.save(function (err) {
-                            if (err)
-                                throw err;
 
-                            // if successful, return the new user
-                            return done(null, newUser);
-                        });
-                    }
-                });
+router.get('/callback/facebook', function (req, res) {
+    /*Get Access Token*/
+    var tokenUrl = 'https://graph.facebook.com/v2.11/oauth/access_token';
+    var dataVal = '?code=' + req.query.code + '&client_id=' + config.facebookAuth.clientID + '&client_secret=' + config.facebookAuth.clientSecret + '&redirect_uri=' + config.facebookAuth.callbackURL + '&grant_type=authorization_code';
+    var options = {
+        method: 'POST',
+        url: tokenUrl + dataVal,
+    };
+    request(options, function (err, response) {
+        response.body = JSON.parse(response.body);
+        var resp = {};
+        var url2 = 'https://graph.facebook.com/v2.11/me?access_token=' + response.body.access_token + '&fields=name,email,work,address,first_name,last_name,middle_name';
+        var options = {
+            method: 'GET',
+            url: url2,
+        };
+        request(options, function (err, response) {
+            var user_data = JSON.parse(response.body);
+            var user_params = {};
+            user_params.email = user_data.email;
+            user_params.username = user_data.email;
+            if (user_data.first_name) {
+                user_params.firstName = user_data.first_name;
+            }
+            if (user_data.last_name) {
+                user_params.lastName = user_data.last_name;
+            }
+
+            user_params.social_login_type = "facebook";
+            user_params.social_id = user_data.id;
+            user_params.planId = config.defaultPlanId;
+            user_params.planPeriod = config.defaultPlanPeriod;
+            user_params.customerCurrencySign = config.defaultCurrencySign;
+            user_params.customerCurrencyCode = config.defaultCurrencyCode;
+            user_params.customerBalance = config.defaultBalance;
+            user_params.auto_recharge_status = config.defaultAutoRechargeStatus;
+            user_params.recharge_balance = config.defaultRechargeBalance;
+            user_params.status = parseInt(1);
+            var clientIp = requestIp.getClientIp(req);
+            user_params.clientIp = clientIp;
+            // register using api to maintain clean separation between layers
+            request.post({
+                url: config.apisUrl + '/customers/loginWithSocial',
+                form: user_params,
+                json: true
+            }, function (error, response, body) {
+                if (body.mfaToken && req.session.mfa != true) {
+                    var clientIp = requestIp.getClientIp(req);
+                    req.session.clientIp = clientIp;
+                    req.session.testingAccount = body.testingAccount;
+                    //req.session.token = body.token;
+                    req.session.customerId = body.customerId;
+                    req.session.username = body.username;
+                    req.session.secret = body.mfaToken;
+                    req.session.mfa = true;
+                    __getPageType({"returnUrl":req.session.returnUrl}, function (result) {
+                        viewData=result;
+                        viewData["username"]= body.username;
+                        viewData["secret"]= body.mfaToken;
+                        res.render('social-login-with-mfa',viewData);
+                        return false;
+                    });
+                    
+                }else{
+                    var clientIp = requestIp.getClientIp(req);
+                    req.session.clientIp = clientIp;
+                    req.session.testingAccount = body.testingAccount;
+                    req.session.token = body.token;
+                    req.session.customerId = body.customerId;
+                    req.session.username = body.username;
+                    req.session.mfa = false;
+                    /*create log*/
+                    logService.customerActivity(req, "LOGIN", "Customer logged in to system from Facebook");
+                    res.render('social-login');
+                }
             });
-        }));
+        });
+    });
+});
+
+
+       
 }
 
     

@@ -72,8 +72,7 @@ export class LoginComponent implements OnInit {
             transparent: false
         };
         // Load the page + route
-        window.open('http://localhost:3000/auth/facebook/callback', 'SocialApp', win);
-
+        window.open('http://localhost:3000/api/users/auth/facebook/callback', 'SocialApp', String(win));
 
         this.UserService.fbLogin().pipe(first())
             .subscribe(
